@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<title>Collected Posts</title>
+<style>
+body { font-family: system-ui, sans-serif; margin: 10px; width: 360px; }
+#posts { margin-top: 8px; max-height: 420px; overflow-y: auto; }
+.post { border:1px solid #ddd; padding:6px; margin-bottom:6px; border-radius:4px; background:#fafafa; }
+.post pre { white-space: pre-wrap; word-break: break-word; margin:4px 0; font-size:12px; }
+.actions button { margin-right:4px; }
+header { display:flex; align-items:center; justify-content:space-between; }
+</style>
+</head>
+<body>
+  <header>
+    <strong>收藏帖子</strong>
+    <div>
+      <button id="refreshBtn">刷新</button>
+      <button id="exportBtn">导出 JSON</button>
+    </div>
+  </header>
+  <div id="posts"></div>
+  <script type="module" src="../popup/index.js"></script>
+</body>
+</html>
