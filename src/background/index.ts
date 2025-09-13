@@ -1,4 +1,4 @@
-import { ExtractedPost, ExtMessage, MessageAllPosts, MessageRequestSave } from '../core/types.js';
+import { ExtractedPost, ExtMessage, MessageAllPosts, MessageRequestSave, MessageRequestDelete, MessageRequestClear } from '../core/types.js';
 
 const STORAGE_KEY = 'spx_posts_v1';
 
@@ -25,6 +25,18 @@ chrome.runtime.onMessage.addListener((msg: ExtMessage, _sender, sendResponse) =>
     const m = msg as MessageRequestSave;
     save(m.post).then(() => sendResponse({ ok: true }));
     return true; // async
+  }
+  if (msg.type === 'REQUEST_DELETE') {
+    const { platform, id } = msg as MessageRequestDelete;
+    getAll().then(posts => {
+      const next = posts.filter(p => !(p.platform === platform && p.id === id));
+      chrome.storage.local.set({ [STORAGE_KEY]: next }, () => sendResponse({ ok: true }));
+    });
+    return true;
+  }
+  if (msg.type === 'REQUEST_CLEAR') {
+    chrome.storage.local.set({ [STORAGE_KEY]: [] }, () => sendResponse({ ok: true }));
+    return true;
   }
   if (msg.type === 'GET_ALL') {
     getAll().then(posts => {

@@ -20,6 +20,7 @@ function render(posts: ExtractedPost[]) {
       <div class="actions">
         <button data-act="copy">复制</button>
         <button data-act="open">打开</button>
+        <button data-act="del" style="color:#b00;">删除</button>
       </div>
     `;
     div.querySelector('[data-act="copy"]')!.addEventListener('click', () => {
@@ -27,6 +28,9 @@ function render(posts: ExtractedPost[]) {
     });
     div.querySelector('[data-act="open"]')!.addEventListener('click', () => {
       if (p.url) chrome.tabs.create({ url: p.url });
+    });
+    div.querySelector('[data-act="del"]')!.addEventListener('click', () => {
+      chrome.runtime.sendMessage({ type: 'REQUEST_DELETE', platform: p.platform, id: p.id } as ExtMessage, () => refresh());
     });
     container.appendChild(div);
   });
@@ -52,5 +56,13 @@ async function refresh() {
   a.click();
   setTimeout(()=>URL.revokeObjectURL(url), 2000);
 });
+
+const clearBtn = document.getElementById('clearBtn') as HTMLButtonElement | null;
+if (clearBtn) {
+  clearBtn.addEventListener('click', () => {
+    if (!confirm('确定清空所有保存的帖子？')) return;
+    chrome.runtime.sendMessage({ type: 'REQUEST_CLEAR' } as ExtMessage, () => refresh());
+  });
+}
 
 refresh();

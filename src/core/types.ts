@@ -28,10 +28,14 @@ export interface MessageRequestSave extends MessageBase<'REQUEST_SAVE'> { post: 
 export interface MessageGetAll extends MessageBase<'GET_ALL'> {}
 export interface MessageAllPosts extends MessageBase<'ALL_POSTS'> { posts: ExtractedPost[]; }
 export interface MessagePing extends MessageBase<'PING'> {}
+export interface MessageRequestDelete extends MessageBase<'REQUEST_DELETE'> { platform: string; id: string; }
+export interface MessageRequestClear extends MessageBase<'REQUEST_CLEAR'> {}
 
 export type ExtMessage =
   | MessageExtractResult
   | MessageRequestSave
   | MessageGetAll
   | MessageAllPosts
-  | MessagePing;
+  | MessagePing
+  | MessageRequestDelete
+  | MessageRequestClear;
