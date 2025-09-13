@@ -30,7 +30,15 @@ function render(posts: ExtractedPost[]) {
       if (p.url) chrome.tabs.create({ url: p.url });
     });
     div.querySelector('[data-act="del"]')!.addEventListener('click', () => {
-      chrome.runtime.sendMessage({ type: 'REQUEST_DELETE', platform: p.platform, id: p.id } as ExtMessage, () => refresh());
+      console.log('[Popup] Sending delete request for:', p.platform, p.id);
+      chrome.runtime.sendMessage({ type: 'REQUEST_DELETE', platform: p.platform, id: p.id } as ExtMessage, (response) => {
+        console.log('[Popup] Delete response:', response);
+        if (response && response.ok) {
+          refresh();
+        } else {
+          alert('删除失败: ' + (response?.error || '未知错误'));
+        }
+      });
     });
     container.appendChild(div);
   });
@@ -61,7 +69,15 @@ const clearBtn = document.getElementById('clearBtn') as HTMLButtonElement | null
 if (clearBtn) {
   clearBtn.addEventListener('click', () => {
     if (!confirm('确定清空所有保存的帖子？')) return;
-    chrome.runtime.sendMessage({ type: 'REQUEST_CLEAR' } as ExtMessage, () => refresh());
+    console.log('[Popup] Sending clear request');
+    chrome.runtime.sendMessage({ type: 'REQUEST_CLEAR' } as ExtMessage, (response) => {
+      console.log('[Popup] Clear response:', response);
+      if (response && response.ok) {
+        refresh();
+      } else {
+        alert('清空失败: ' + (response?.error || '未知错误'));
+      }
+    });
   });
 }
 

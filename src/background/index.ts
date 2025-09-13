@@ -28,15 +28,38 @@ chrome.runtime.onMessage.addListener((msg: ExtMessage, _sender, sendResponse) =>
   }
   if (msg.type === 'REQUEST_DELETE') {
     const { platform, id } = msg as MessageRequestDelete;
+    console.log('[Background] Received delete request for:', platform, id);
     getAll().then(posts => {
+      console.log('[Background] Posts before delete:', posts.length);
       const next = posts.filter(p => !(p.platform === platform && p.id === id));
-      chrome.storage.local.set({ [STORAGE_KEY]: next }, () => sendResponse({ ok: true }));
+      console.log('[Background] Posts after delete:', next.length);
+      chrome.storage.local.set({ [STORAGE_KEY]: next }, () => {
+        if (chrome.runtime.lastError) {
+          console.error('[Background] Storage set error:', chrome.runtime.lastError);
+          sendResponse({ ok: false, error: chrome.runtime.lastError.message });
+        } else {
+          console.log('[Background] Delete completed');
+          sendResponse({ ok: true });
+        }
+      });
+    }).catch(error => {
+      console.error('[Background] Delete error:', error);
+      sendResponse({ ok: false, error: error.message });
     });
-    return true;
+    return true; // Keep message port open for async response
   }
   if (msg.type === 'REQUEST_CLEAR') {
-    chrome.storage.local.set({ [STORAGE_KEY]: [] }, () => sendResponse({ ok: true }));
-    return true;
+    console.log('[Background] Received clear request');
+    chrome.storage.local.set({ [STORAGE_KEY]: [] }, () => {
+      if (chrome.runtime.lastError) {
+        console.error('[Background] Storage clear error:', chrome.runtime.lastError);
+        sendResponse({ ok: false, error: chrome.runtime.lastError.message });
+      } else {
+        console.log('[Background] Clear completed');
+        sendResponse({ ok: true });
+      }
+    });
+    return true; // Keep message port open for async response
   }
   if (msg.type === 'GET_ALL') {
     getAll().then(posts => {
