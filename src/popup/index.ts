@@ -25,6 +25,8 @@ function render(posts: ExtractedPost[]) {
     `;
     div.querySelector('[data-act="copy"]')!.addEventListener('click', () => {
       navigator.clipboard.writeText(p.text);
+      // Send to background for saving to server
+      chrome.runtime.sendMessage({ type: 'REQUEST_COPY', text: p.text, platform: p.platform } as ExtMessage);
     });
     div.querySelector('[data-act="open"]')!.addEventListener('click', () => {
       if (p.url) chrome.tabs.create({ url: p.url });

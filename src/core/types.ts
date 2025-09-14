@@ -30,6 +30,8 @@ export interface MessageAllPosts extends MessageBase<'ALL_POSTS'> { posts: Extra
 export interface MessagePing extends MessageBase<'PING'> {}
 export interface MessageRequestDelete extends MessageBase<'REQUEST_DELETE'> { platform: string; id: string; }
 export interface MessageRequestClear extends MessageBase<'REQUEST_CLEAR'> {}
+export interface MessageRequestCopy extends MessageBase<'REQUEST_COPY'> { text: string; platform: string; }
+export interface MessageRequestCopy extends MessageBase<'REQUEST_COPY'> { text: string; platform: string; }
 
 export type ExtMessage =
   | MessageExtractResult
@@ -38,4 +40,5 @@ export type ExtMessage =
   | MessageAllPosts
   | MessagePing
   | MessageRequestDelete
-  | MessageRequestClear;
+  | MessageRequestClear
+  | MessageRequestCopy;

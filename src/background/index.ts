@@ -1,4 +1,4 @@
-import { ExtractedPost, ExtMessage, MessageAllPosts, MessageRequestSave, MessageRequestDelete, MessageRequestClear } from '../core/types.js';
+import { ExtractedPost, ExtMessage, MessageAllPosts, MessageRequestSave, MessageRequestDelete, MessageRequestClear, MessageRequestCopy } from '../core/types.js';
 
 const STORAGE_KEY = 'spx_posts_v1';
 
@@ -61,12 +61,27 @@ chrome.runtime.onMessage.addListener((msg: ExtMessage, _sender, sendResponse) =>
     });
     return true; // Keep message port open for async response
   }
-  if (msg.type === 'GET_ALL') {
-    getAll().then(posts => {
-      const resp: MessageAllPosts = { type: 'ALL_POSTS', posts };
-      sendResponse(resp);
+  if (msg.type === 'REQUEST_COPY') {
+    const { text, platform } = msg as MessageRequestCopy;
+    console.log('[Background] Received copy request for:', platform, text.substring(0, 50) + '...');
+    // Send to local Python server
+    fetch('http://127.0.0.1:5000/save_post', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ text, platform }),
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('[Background] Server response:', data);
+      sendResponse({ ok: true });
+    })
+    .catch(error => {
+      console.error('[Background] Error sending to server:', error);
+      sendResponse({ ok: false, error: error.message });
     });
-    return true;
+    return true; // async
   }
   return false;
 });
